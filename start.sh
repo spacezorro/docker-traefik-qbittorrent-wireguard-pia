@@ -202,7 +202,13 @@ echo "--------------------" | ts '%Y-%m-%d %H:%M:%.S'
 echo "[INFO] Starting iptables logger in stderr..." | ts '%Y-%m-%d %H:%M:%.S'
 ( 
   # This starts ulog and eats the logfile and spits it to stderr a line at a time
-  ulogd -d
+  (
+    while true
+    do
+      ulogd
+      sleep 3
+    done
+  ) &
   while true
   do
     if [[ ! -s /var/log/nflog ]]
@@ -261,8 +267,10 @@ PIDS["QBT"]=$!
 sleep 10
 
 echo "[INFO] Starting qBittorrent logger in stderr..." | ts '%Y-%m-%d %H:%M:%.S'
-cat /tmp/qbittorrent.log >&2 
-tail -Fc0 /tmp/qbittorrent.log >&2 &
+(
+  cat /tmp/qbittorrent.log >&2 
+  tail -Fc0 /tmp/qbittorrent.log >&2 
+) &
 PIDS["QLOG"]=$!
 (
   while true
