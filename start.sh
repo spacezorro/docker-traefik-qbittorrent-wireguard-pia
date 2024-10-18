@@ -210,9 +210,9 @@ echo "--------------------" | ts '%Y-%m-%d %H:%M:%.S'
 #) &
 
 # Make the logging of the iptables go to STDERR
+ln -sf /proc/1/fd/2 /var/log/nflog
 ulogd -d
 PIDS["ULOG"]=$!
-ln -sf /proc/1/fd/2 /var/log/nflog
 
 # Set up things
 mkdir -p /config/qBittorrent/config
@@ -239,7 +239,6 @@ echo "[INFO] Whitelisting logins for docker (${docker_network}) and host (${LAN_
 sed -i "s|^WebUI.AuthSubnetWhitelist=.*|WebUI\\\AuthSubnetWhitelist=${docker_network}, ${LAN_NETWORK}|" /config/qBittorrent/config/qBittorrent.conf
 
 echo "[INFO] Starting qBittorrent logger in stderr..." | ts '%Y-%m-%d %H:%M:%.S'
-mkdir -p /tmp/qbittorrent.log
 ln -sf /proc/1/fd/2 /tmp/qbittorrent.log
 
 # Start qBittorrent
