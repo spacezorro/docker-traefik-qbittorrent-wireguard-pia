@@ -266,12 +266,9 @@ echo "[INFO] Starting qBittorrent daemon..." | ts '%Y-%m-%d %H:%M:%.S'
 chmod -R 755 /config/qBittorrent
 bash /entrypoint.sh &>/dev/null &
 PIDS["QBT"]=$!
-        
-# wait for the entrypoint.sh script to finish and grab the qbittorrent pid
-while ! pgrep -f "qbittorrent-nox" >/dev/null
-do
-  sleep 0.5
-done
+
+# allow qBt to come up
+sleep 10
 
 is_wg_down=0
 is_wg_down_die=5
