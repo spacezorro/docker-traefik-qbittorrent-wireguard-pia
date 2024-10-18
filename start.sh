@@ -199,28 +199,27 @@ echo "--------------------" | ts '%Y-%m-%d %H:%M:%.S'
 iptables -S 2>&1 | ts '%Y-%m-%d %H:%M:%.S'
 echo "--------------------" | ts '%Y-%m-%d %H:%M:%.S'
 
-#echo "[INFO] Starting iptables logger in stderr..." | ts '%Y-%m-%d %H:%M:%.S'
-#( 
-#  # This starts ulog and eats the logfile and spits it to stderr a line at a time
-#  ulogd -d
-#  while true
-#  do
-#    if [[ ! -s /var/log/nflog ]]
-#    then
-#        sleep 5
-#        continue
-#    fi
-#    # nflog has it's own timestamp so we don't need ts
-#    head -n 1 /var/log/nflog >&2
-#    sed -i '1d' /var/log/nflog
-#    sleep 1
-#  done
-#) &
-
-# Make the logging of the iptables go to STDERR
-ln -sf /proc/1/fd/2 /var/log/nflog
-ulogd -d
+echo "[INFO] Starting iptables logger in stderr..." | ts '%Y-%m-%d %H:%M:%.S'
+( 
+  # This starts ulog and eats the logfile and spits it to stderr a line at a time
+  ulogd -d
+  while true
+  do
+    if [[ ! -s /var/log/nflog ]]
+    then
+        sleep 5
+        continue
+    fi
+    # nflog has it's own timestamp so we don't need ts
+    head -n 1 /var/log/nflog >&2
+    sed -i '1d' /var/log/nflog
+    sleep 1
+  done
+) &
 PIDS["ULOG"]=$!
+# Make the logging of the iptables go to STDERR
+#ln -sf /proc/1/fd/2 /var/log/nflog
+#ulogd -d
 
 # Set up things
 mkdir -p /config/qBittorrent/config
