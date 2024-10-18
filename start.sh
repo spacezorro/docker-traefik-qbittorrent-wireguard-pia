@@ -3,6 +3,14 @@
 
 set -e
 declare -A PIDS
+PIDS["MAIN"]=$$
+
+die() {
+  echo "[FATAL] Exiting with error code 1" | ts '%Y-%m-%d %H:%M:%.S'
+  exit 1
+}
+trap die SIGTERM 
+trap die EXIT
 
 net_admin_bit=0x4000000
 cap_eff="0x$(grep CapEff /proc/self/status | awk '{print $2}')"
@@ -100,8 +108,7 @@ export PIA_PF=true
     echo "[ERROR][PIA-WG] PIA Wireguard Exited!! It shouldn't do that. Restarting $i/3..."  | ts '%Y-%m-%d %H:%M:%.S'
   done
   echo "[ERROR][PIA-WG] PIA Wireguard Exited too many times!! Check the PIA account."  | ts '%Y-%m-%d %H:%M:%.S'
-  exit 1
-) &
+) && kill -SIGTERM $$ || kill -SIGTERM $$ &
 PIDS["PIA"]=$!
 
 # What if wireguard never comes up
