@@ -1,11 +1,11 @@
 version: "3.2"
 
 services:
-  qbittorrent-wg:
-    image: spacezorro/qbittorrent-wg:latest
+  qbittorrent-pia:
+    image: spacezorro/qbittorrent-pia:latest
     env_file: /var/data/config/qbittorrent/qbittorrent.env
     volumes:
-      # My docker stuff is based off .. probably change it
+      # My docker stuff is based off this .. probably change it
       # https://geek-cookbook.funkypenguin.co.nz/docker-swarm/
       - /var/data/config/qbittorrent:/config
       - /var/data/media:/downloads
