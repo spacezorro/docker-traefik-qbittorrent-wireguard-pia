@@ -12,7 +12,8 @@ then
       healthy=false
     fi
   done
-  if $healthy; then
+  if $healthy
+  then
     echo "OK"
     exit 0
   else
