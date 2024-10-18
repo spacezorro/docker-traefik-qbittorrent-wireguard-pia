@@ -287,10 +287,7 @@ do
     PIDS["QBT"]=$!
             
     # wait for the entrypoint.sh script to finish and grab the qbittorrent pid
-    while ! pgrep -f "qbittorrent-nox" &>/dev/null
-    do
-      sleep 0.5
-    done
+    sleep 10
     qbittorrentpid=$(pgrep -f "qbittorrent-nox")
   fi
 
