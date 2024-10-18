@@ -1,0 +1,26 @@
+{
+    "abook": {
+        "save_path": "/downloads/qtor/complete/abook"
+    },
+    "comic": {
+        "save_path": "/downloads/qtor/complete/comic"
+    },
+    "ebook": {
+        "save_path": "/downloads/qtor/complete/ebook"
+    },
+    "manual": {
+        "save_path": "/downloads/qtor/complete/manual"
+    },
+    "music": {
+        "save_path": "/downloads/qtor/complete/audio"
+    },
+    "radarr": {
+        "save_path": "/downloads/qtor/complete/radarr"
+    },
+    "seedforever": {
+        "save_path": "/downloads/qtor/seedforever"
+    },
+    "sonarr": {
+        "save_path": "/downloads/qtor/complete/sonarr"
+    }
+}

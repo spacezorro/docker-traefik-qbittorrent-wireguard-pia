@@ -1,0 +1,32 @@
+version: "3.2"
+
+services:
+  qbittorrent-wg:
+    image: spacezorro/qbittorrent-wg:latest
+    env_file: /var/data/config/qbittorrent/qbittorrent.env
+    volumes:
+      # My docker stuff is based off .. probably change it
+      # https://geek-cookbook.funkypenguin.co.nz/docker-swarm/
+      - /var/data/config/qbittorrent:/config
+      - /var/data/media:/downloads
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik_public
+        - "traefik.http.routers.authelia.rule=Host(`qbittorrent.example.com`)"
+        - "traefik.http.routers.authelia.entrypoints=https"
+        - "traefik.http.services.authelia.loadbalancer.server.port=8080"
+    networks:
+      - traefik_public
+    cap_add:
+      - "NET_ADMIN"
+    sysctls:
+      - "net.ipv4.conf.all.rp_filter=2"
+      - "net.ipv4.conf.all.src_valid_mark=1"
+      - "net.ipv6.conf.all.disable_ipv6=1"
+      - "net.ipv6.conf.default.disable_ipv6=1"
+      - "/var/data/config/qbittorrent-wg:/config"
+
+networks:
+  traefik_public:
+    external: true 
