@@ -247,7 +247,19 @@ echo "[INFO] Whitelisting logins for docker (${docker_network}) and host (${LAN_
 sed -i "s|^WebUI.AuthSubnetWhitelist=.*|WebUI\\\AuthSubnetWhitelist=${docker_network}, ${LAN_NETWORK}|" /config/qBittorrent/config/qBittorrent.conf
 
 echo "[INFO] Starting qBittorrent logger in stderr..." | ts '%Y-%m-%d %H:%M:%.S'
-ln -sf /proc/1/fd/2 /tmp/qbittorrent.log
+mkfifo /tmp/qbittorrent.log
+chmod 666 /tmp/qbittorrent.log
+chown qbtUser /tmp/qbittorrent.log
+(
+  while true
+  do
+    if read line < /tmp/qbittorrent.log
+    then
+      echo "$line" >&2
+    fi
+  done
+) &
+PIDS["QLOG"]=$!
 
 # Start qBittorrent
 echo "[INFO] Starting qBittorrent daemon..." | ts '%Y-%m-%d %H:%M:%.S'
@@ -255,23 +267,6 @@ chmod -R 755 /config/qBittorrent
 bash /entrypoint.sh &>/dev/null &
 PIDS["QBT"]=$!
         
-#( 
-#  # This moves the logfile and cats it to stderr
-#  log=/config/qBittorrent/data/logs/qbittorrent.log
-#  while true
-#  do
-#    if [[ ! -s $log ]]
-#    then
-#        sleep 5
-#        continue
-#    fi
-#    mv ${log} ${log}.logger
-#    cat ${log}.logger >&2
-#    rm ${log}.logger
-#  done
-#) &
-#PIDS["QLOG"]=$!
-
 # wait for the entrypoint.sh script to finish and grab the qbittorrent pid
 while ! pgrep -f "qbittorrent-nox" >/dev/null
 do
