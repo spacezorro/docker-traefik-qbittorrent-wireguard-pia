@@ -31,8 +31,8 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          username: ${{ DOCKER_HUB_USERNAME }}
+          password: ${{ DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Build and push :tag
         if: github.event_name == 'release'
@@ -41,8 +41,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/qbittorrent-pia:${{ github.event.release.tag_name }}
-            ${{ secrets.DOCKER_HUB_USERNAME }}/qbittorrent-pia:latest
+            ${{ DOCKER_HUB_USERNAME }}/qbittorrent-pia:${{ github.event.release.tag_name }}
+            ${{ DOCKER_HUB_USERNAME }}/qbittorrent-pia:latest
           platforms: linux/amd64,linux/arm64,linux/arm/v7
 
       - name: Build and push :develop
@@ -52,7 +52,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/qbittorrent-pia:develop
+            ${{ DOCKER_HUB_USERNAME }}/qbittorrent-pia:develop
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           cache-from: type=gha
           cache-to: type=gha,mode=max
