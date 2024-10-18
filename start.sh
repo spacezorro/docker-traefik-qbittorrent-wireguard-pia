@@ -394,15 +394,26 @@ do
       portData="json={\"listen_port\":$currentPort}"
       curl -i --silent --interface $docker_interface --data $portData $WEBUI_URL/api/v2/app/setPreferences --cookie $cookie >/dev/null 2>&1
     fi
+    if [[ ${ADD_TORRENT_TRACKER:=false} ]]
+    then
+      torrents=$(curl --silent --interface $docker_interface $WEBUI_URL/api/v2/torrents/info --cookie $cookie ) >/dev/null 2>&1
+      if ! echo "$torrents" | grep -q "WhatIsMyIP.net - Torrent Tracker IP Checker"
+      then
+	magnet=$(curl -L --silent --interface pia "https://www.whatismyip.net/tools/torrent-ip-checker/index.php" | grep -o 'href="magnet:[^"]*' | sed 's/href="//;s|&amp;|\&|g')
+	curl -s -X POST $WEBUI_URL/api/v2/torrents/add -H "Cookie: $cookie" --interface $docker_interface -F "urls=$magnet"
+	# Only do it once. If you delete it, it won't readd unless you restart.
+	ADD_TORRENT_TRACKER=false
+      fi
+    fi
     curl --silent -X 'POST' "$WEBUI_URL/api/v2/auth/logout" -H 'accept: */*' -d '' --cookie $cookie >/dev/null 2>&1
   else
     echo "[WARNING] Unable to log into the web UI." | ts '%Y-%m-%d %H:%M:%.S'
   fi
   unset cookie
 
-  sleep 30
+  sleep 90
 done
         
 echo "[ERROR] You should never reach here" | ts '%Y-%m-%d %H:%M:%.S'
 exit 1
-        
+  
