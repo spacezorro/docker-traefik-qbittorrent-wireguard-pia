@@ -105,7 +105,8 @@ export PIA_PF=true
 PIDS["PIA"]=$!
 
 # What if wireguard never comes up
-max_loops=60
+# 12 loops * 10 seconds is 2 minutes that should be enough
+max_loops=12
 for ((loop=0; loop<max_loops; loop++)); do
     set +e ; tunnelstat=$(netstat -ie | grep "pia") ; set -e
     [[ -n "${tunnelstat}" ]] && break
