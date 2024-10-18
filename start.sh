@@ -245,29 +245,33 @@ fi
 echo "[INFO] Whitelisting logins for docker (${docker_network}) and host (${LAN_NETWORK}) networks" | ts '%Y-%m-%d %H:%M:%.S'
 sed -i "s|^WebUI.AuthSubnetWhitelist=.*|WebUI\\\AuthSubnetWhitelist=${docker_network}, ${LAN_NETWORK}|" /config/qBittorrent/config/qBittorrent.conf
 
-echo "[INFO] Starting qBittorrent logger in stderr..." | ts '%Y-%m-%d %H:%M:%.S'
-mkfifo /tmp/qbittorrent.log
-chmod 666 /tmp/qbittorrent.log
-chown qbtUser /tmp/qbittorrent.log
-(
-  while true
-  do
-    if read line < /tmp/qbittorrent.log
-    then
-      echo "$line" >&2
-    fi
-  done
-) &
-PIDS["QLOG"]=$!
-
 # Start qBittorrent
 echo "[INFO] Starting qBittorrent daemon..." | ts '%Y-%m-%d %H:%M:%.S'
 chmod -R 755 /config/qBittorrent
-bash /entrypoint.sh &>/dev/null &
+(
+  while true
+  do
+    bash /entrypoint.sh | sed 's|^|[QBITTORRENT] ]|' | ts '%Y-%m-%d %H:%M:%.S'
+    sleep 3
+  done
+) &
 PIDS["QBT"]=$!
 
 # allow qBt to come up
 sleep 10
+
+echo "[INFO] Starting qBittorrent logger in stderr..." | ts '%Y-%m-%d %H:%M:%.S'
+cat /tmp/qbittorrent.log >&2 
+tail -Fc0 /tmp/qbittorrent.log >&2 &
+PIDS["QLOG"]=$!
+(
+  while true
+  do
+    [[ -f /tmp/qbittorrent.log.bak ]] && rm -f /tmp/qbittorrent.log.bak*
+    sleep 60
+  done
+) &
+PIDS["QLOGrm"]=$!
 
 is_wg_down=0
 is_wg_down_die=5
